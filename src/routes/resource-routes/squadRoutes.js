@@ -1,11 +1,10 @@
-'use strict';
+"use strict";
 
-const express = require('express');
-const { db, User } = require('../../schemas/index');
-const bearerAuth = require('../../middleware/bearerauth');
+const express = require("express");
+const { db, User } = require("../../schemas/index");
+const bearerAuth = require("../../middleware/bearerauth");
 const squadRouter = express.Router();
-const { v4: uuidv4 } = require('uuid');
-const createError = require('http-errors');
+const createError = require("http-errors");
 
 const getUserSquads = async (req, res, next) => {
   const user = await User.findOne({ where: { username: req.user.username } });
@@ -23,6 +22,9 @@ const getUserSquads = async (req, res, next) => {
   try {
     let arr = [];
     for (let x = 0; x < userSquadIds.length; x++) {
+      let squad = await db.model.Squads.findOne({
+        where: { id: userSquadIds[x] },
+      });
       let members = await db.models.team.findAll({
         where: { SquadId: userSquadIds[x] },
       });
@@ -34,7 +36,7 @@ const getUserSquads = async (req, res, next) => {
         let user = await User.findOne({ where: { id: memberIds[x] } });
         groupMembers.push(user.username);
       }
-      arr.push(groupMembers);
+      arr.push({ name: squad.name, squadmates: groupMembers });
     }
     res.status(200).json({ squads: arr });
   } catch (err) {
@@ -45,7 +47,7 @@ const getUserSquads = async (req, res, next) => {
 const createSquad = async (req, res, next) => {
   try {
     const newSquad = await db.models.Squads.create({
-      name: uuidv4(),
+      name: req.body.name,
       owner: req.user.username,
     });
 
@@ -58,7 +60,7 @@ const createSquad = async (req, res, next) => {
     });
     res.status(201).json({
       message: `Created a new squad with ${req.body.squadmates.join(
-        ', '
+        ", "
       )} and ${req.user.username}`,
     });
   } catch (err) {
@@ -74,19 +76,19 @@ const deleteSquad = async (req, res, next) => {
     if (squad[0].owner == req.user.username) {
       await db.models.team.destroy({ where: { SquadId } });
       await db.models.Squads.destroy({ where: { id: SquadId } });
-      res.status(202).json({ message: 'Deleted successfully' });
+      res.status(202).json({ message: "Deleted successfully" });
     } else {
-      return next(createError(403, 'You can only delete squads that you own!'));
+      return next(createError(403, "You can only delete squads that you own!"));
     }
   } catch (err) {
     return next(createError(403, err.message));
   }
 };
 
-squadRouter.get('/squads', bearerAuth, getUserSquads);
+squadRouter.get("/squads", bearerAuth, getUserSquads);
 
-squadRouter.post('/squads', bearerAuth, createSquad);
+squadRouter.post("/squads", bearerAuth, createSquad);
 
-squadRouter.delete('/squads', bearerAuth, deleteSquad);
+squadRouter.delete("/squads", bearerAuth, deleteSquad);
 
 module.exports = squadRouter;
