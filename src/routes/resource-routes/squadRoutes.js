@@ -1,7 +1,7 @@
 "use strict";
 
 const express = require("express");
-const { db, User } = require("../../schemas/index");
+const { db, User, Squad } = require("../../schemas/index");
 const bearerAuth = require("../../middleware/bearerauth");
 const squadRouter = express.Router();
 const createError = require("http-errors");
@@ -22,7 +22,7 @@ const getUserSquads = async (req, res, next) => {
   try {
     let arr = [];
     for (let x = 0; x < userSquadIds.length; x++) {
-      let squad = await db.model.Squads.findOne({
+      let squad = await Squad.findOne({
         where: { id: userSquadIds[x] },
       });
       let members = await db.models.team.findAll({
