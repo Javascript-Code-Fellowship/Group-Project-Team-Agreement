@@ -12,7 +12,7 @@ const getUserSquads = async (req, res, next) => {
   let userSquadIds;
   try {
     let squads = await db.models.team.findAll({ where: { UserId: user.id } });
-
+    console.log(squads);
     userSquadIds = squads.map((row) => {
       return row.SquadId;
     });
@@ -26,6 +26,7 @@ const getUserSquads = async (req, res, next) => {
       let members = await db.models.team.findAll({
         where: { SquadId: userSquadIds[x] },
       });
+      console.log(members);
       let memberIds = members.map((member) => {
         return member.UserId;
       });
@@ -45,7 +46,7 @@ const getUserSquads = async (req, res, next) => {
 const createSquad = async (req, res, next) => {
   try {
     const newSquad = await db.models.Squads.create({
-      name: uuidv4(),
+      name: req.body.name,
       owner: req.user.username,
     });
 

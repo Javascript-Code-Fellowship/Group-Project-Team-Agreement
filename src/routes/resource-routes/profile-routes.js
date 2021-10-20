@@ -11,9 +11,14 @@ const acl = require('../../middleware/acl.js');
 const handleCreate = async (req, res, next) => {
   try {
     let userid = req.user.id;
-    let username = req.user.username
+    let username = req.user.username;
     let { bio, game } = req.body;
-    let record = await Profile.create({ bio, game, UserId: userid, username: username });
+    let record = await Profile.create({
+      bio,
+      game,
+      UserId: userid,
+      username: username,
+    });
     res.status(201).send(record);
   } catch (e) {
     return next(createError(500, 'Something went wrong'));
@@ -38,7 +43,8 @@ const handleUpdateOne = async (req, res, next) => {
     try {
       let obj = req.body;
       let updated = await Profile.update(obj, { where: { UserId: userid } });
-      res.status(202).send(updated);
+      record = await Profile.findOne({ where: { UserId: userid } });
+      res.status(202).send(record);
     } catch (e) {
       return next(createError(404, 'Could not find that note'));
     }

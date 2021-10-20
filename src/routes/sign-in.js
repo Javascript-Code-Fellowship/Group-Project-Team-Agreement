@@ -8,8 +8,10 @@ const createError = require('http-errors');
 
 const signup = async (req, res, next) => {
   try {
-    console.log(req.body)
+    console.log(req.body);
     let userRecord = await User.create(req.body);
+    console.log(userRecord);
+
     const user = {
       user: userRecord,
       token: userRecord.token,
@@ -27,7 +29,7 @@ const signup = async (req, res, next) => {
 
 const signin = async (req, res, next) => {
   try {
-    console.log(req.body)
+    console.log(req.body);
     const user = {
       user: req.user,
       token: req.user.token,
@@ -39,6 +41,6 @@ const signin = async (req, res, next) => {
 };
 
 authRouter.post('/signup', signup);
-authRouter.post('/signin', basicAuth, signin)
+authRouter.post('/signin', basicAuth, signin);
 
 module.exports = authRouter;
