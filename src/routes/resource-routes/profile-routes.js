@@ -20,6 +20,16 @@ const handleCreate = async (req, res, next) => {
   }
 };
 
+const handleGetUser = async (req, res, next) => {
+  try {
+    let id = req.user.id;
+    let record = await Profile.findOne({ where: { UserId: id } });
+    res.status(200).send(record);
+  } catch (e) {
+    return next(createError(404, 'Could not find that profile'));
+  }
+};
+
 const handleGetOne = async (req, res, next) => {
   try {
     let id = req.params.id;
@@ -60,6 +70,7 @@ const handleDeleteOne = async (req, res, next) => {
 };
 
 profileRouter.post('/profile', bearerAuth, acl('create'), handleCreate);
+profileRouter.get('/profile', bearerAuth, acl('read'), handleGetUser);
 profileRouter.get('/profile/:id', bearerAuth, acl('read'), handleGetOne);
 profileRouter.put('/profile', bearerAuth, acl('update'), handleUpdateOne);
 profileRouter.delete('/profile', bearerAuth, acl('delete'), handleDeleteOne);
