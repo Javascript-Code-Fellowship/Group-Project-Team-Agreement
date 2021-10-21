@@ -12,10 +12,10 @@ const handleCreate = async (req, res, next) => {
   try {
     let userid = req.user.id;
     let username = req.user.username;
-    let { bio, game } = req.body;
+    let { bio, games } = req.body;
     let record = await Profile.create({
       bio,
-      game,
+      games,
       UserId: userid,
       username: username,
     });
